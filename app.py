@@ -87,7 +87,7 @@ def handler():
 
    if text in ['пицца', 'pizza' 'большую', 'наличкой', 'да']:
        if fs.is_nap():
-           if text == "pizza":
+           if text == "пицца":
                ord.set_id(chat_id)
                fs.new_order(chat_id, msg_id)
 
