@@ -56,7 +56,7 @@ class Storage(object):
 
 ord = Order()
 fs = Storage()
-machine = Machine(model=fs, states=['nap', 'ask_which', 'repeat', 'ack', 'half_nap', 'repeat'],
+machine = Machine(model=fs, states=['nap', 'ask_which', 'ack', 'half_nap'],
                         initial='nap')
 machine.add_transition('new_order', 'nap', 'ask_which')
 
@@ -69,7 +69,7 @@ machine.add_transition('sleep', 'half_nap', 'nap', before='gratitude')
 machine.add_transition('on_wrong_input', '*', 'nap')
 
 @app.route('/{}'.format(bot_token), methods=['POST'])
-def handler():
+def respond():
 
    update = telegram.Update.de_json(request.get_json(force=True), bot_)
 
@@ -84,15 +84,16 @@ def handler():
    #allowed words list = ['pizza', 'пица', 'пиц', 'иц',
    #'ицца', 'цца', 'большая', 'маленькая' ,'мал', 'мале', 'алень', 'да', 'д', 'нет'
    #'не', 'не', 'над', 'пусть' 'н']
+   recognition_list = ['пицца', 'pizza', 'большую', 'маленькую','наличкой', 'да']
 
-   if text in ['пицца', 'pizza' 'большую', 'наличкой', 'да']:
+   if text in recognition_list:
        if fs.is_nap():
            if text == "пицца":
                ord.set_id(chat_id)
                fs.new_order(chat_id, msg_id)
 
        if fs.is_ask_which():
-           if text == "большую":
+           if text in ["большую", "маленькую"]:
                ord.set_size(text)
                fs.consent(chat_id, msg_id)
 
@@ -112,7 +113,7 @@ def handler():
        try:
 
            text = re.sub(r"\W", "_", text)
-           bot_.sendMessage(chat_id=chat_id, text=text + " - Я еще учусь и этого не понимаю")
+           bot_.sendMessage(chat_id=chat_id, text=text + " - Я еще учусь и этого не понимаю. Попробуйте начать словом 'пицца'")
        except Exception:
 
            bot_.sendMessage(chat_id=chat_id, text="Something happened to me... ask developers",
