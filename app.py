@@ -51,6 +51,11 @@ class Storage(object):
         tnx = "Спасибо за заказ"
         bot_.sendMessage(chat_id=chat_id, text=tnx, reply_to_message_id=msg_id)
         return
+    
+    def refuse(self, chat_id, msg_id):
+        ref = "Заказ отменен"
+        bot_.sendMessage(chat_id=chat_id, text=ref, reply_to_message_id=msg_id)
+        return
 
     def clean(self): return
 
@@ -66,6 +71,7 @@ machine.add_transition('consent', 'ask_which', 'ack', before='ask_how')
 
 machine.add_transition('to_bed', 'ack', 'half_nap', before='affirm' )
 machine.add_transition('sleep', 'half_nap', 'nap', before='gratitude')
+machine.add_transition('on_refuse', '*', 'nap', before='refuse')
 machine.add_transition('on_wrong_input', '*', 'nap')
 
 @app.route('/{}'.format(bot_token), methods=['POST'])
@@ -84,7 +90,7 @@ def respond():
    #allowed words list = ['pizza', 'пица', 'пиц', 'иц',
    #'ицца', 'цца', 'большая', 'маленькая' ,'мал', 'мале', 'алень', 'да', 'д', 'нет'
    #'не', 'не', 'над', 'пусть' 'н']
-   recognition_list = ['пицца', 'pizza', 'большую', 'маленькую','наличкой', 'да']
+   recognition_list = ['пицца', 'pizza', 'большую', 'маленькую','наличкой', 'да', 'нет']
 
    if text in recognition_list:
        if fs.is_nap():
@@ -106,6 +112,10 @@ def respond():
            if text == "да":
                ord.throw_to_db()
                fs.sleep(chat_id, msg_id)
+               ConversationHandler.END
+           
+           if text == "нет":
+               fs.on_refuse(chat_id, msg_id)
                ConversationHandler.END
 
    else:
