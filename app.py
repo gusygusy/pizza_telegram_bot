@@ -119,9 +119,9 @@ def respond():
                ConversationHandler.END
 
    else:
-       fs.on_wrong_input()
+       
        try:
-
+           fs.on_wrong_input()
            text = re.sub(r"\W", "_", text)
            bot_.sendMessage(chat_id=chat_id, text=text + " - Я еще учусь и этого не понимаю. Попробуйте начать словом 'пицца'")
        except Exception:
