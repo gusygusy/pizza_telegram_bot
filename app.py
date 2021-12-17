@@ -94,7 +94,7 @@ def respond():
 
    if text in recognition_list:
        if fs.is_nap():
-           if text == "пицца":
+           if text in ["пицца", "pizza"]:
                ord.set_id(chat_id)
                fs.new_order(chat_id, msg_id)
 
@@ -121,9 +121,14 @@ def respond():
    else:
        
        try:
-           fs.on_wrong_input()
-           text = re.sub(r"\W", "_", text)
-           bot_.sendMessage(chat_id=chat_id, text=text + " - Я еще учусь и этого не понимаю. Попробуйте начать словом 'пицца'")
+           if text in ['/start', 'start']:
+               bot_.sendMessage(chat_id=chat_id, text=" Hi! Type 'pizza' to start")
+               fs.on_wrong_input()
+           else:
+               fs.on_wrong_input()
+               text = re.sub(r"\W", "_", text)
+               bot_.sendMessage(chat_id=chat_id, text=text + " - Я еще учусь и этого не понимаю. Попробуйте начать словом 'пицца'")
+       
        except Exception:
 
            bot_.sendMessage(chat_id=chat_id, text="Something happened to me... ask developers",
